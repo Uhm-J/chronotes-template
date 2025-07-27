@@ -1,0 +1,11 @@
+# Ignore build and runtime artefacts
+/backend/users.db
+/frontend/node_modules
+/frontend/dist
+# OS junk files
+*.DS_Store
+
+
+backend/.env
+frontend/.env
+backend/client_secret.json
