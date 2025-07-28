@@ -2,37 +2,26 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
-// User represents a user in the system
 type User struct {
-	ID        int64     `json:"id" db:"id"`
-	Email     string    `json:"email" db:"email"`
-	Name      string    `json:"name" db:"name"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID        uint           `json:"id" gorm:"primaryKey"`
+	Email     string         `json:"email" gorm:"size:255;uniqueIndex;not null"`
+	Name      string         `json:"name" gorm:"size:255;not null"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-// CreateUserRequest represents the data needed to create a new user
-type CreateUserRequest struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-
-// UpdateUserRequest represents the data that can be updated for a user
-type UpdateUserRequest struct {
-	Name *string `json:"name,omitempty"`
-}
-
-// UserResponse represents the user data returned in API responses
 type UserResponse struct {
-	ID        int64     `json:"id"`
+	ID        uint      `json:"id"`
 	Email     string    `json:"email"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// ToResponse converts a User to a UserResponse
 func (u *User) ToResponse() *UserResponse {
 	return &UserResponse{
 		ID:        u.ID,
@@ -40,4 +29,4 @@ func (u *User) ToResponse() *UserResponse {
 		Name:      u.Name,
 		CreatedAt: u.CreatedAt,
 	}
-} 
+}

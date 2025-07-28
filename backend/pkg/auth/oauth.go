@@ -17,7 +17,7 @@ type OAuthService struct {
 
 // NewOAuthService creates a new OAuth service
 func NewOAuthService(clientID, clientSecret, redirectURL string) *OAuthService {
-	config := &oauth2.Config{
+	cfg := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
@@ -27,8 +27,7 @@ func NewOAuthService(clientID, clientSecret, redirectURL string) *OAuthService {
 		},
 		Endpoint: google.Endpoint,
 	}
-
-	return &OAuthService{config: config}
+	return &OAuthService{config: cfg}
 }
 
 // GetAuthURL returns the OAuth authorization URL
@@ -60,7 +59,6 @@ type GoogleUserInfo struct {
 // GetUserInfo retrieves user information from Google using the provided token
 func (s *OAuthService) GetUserInfo(ctx context.Context, token *oauth2.Token) (*GoogleUserInfo, error) {
 	client := s.config.Client(ctx, token)
-	
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
@@ -71,10 +69,9 @@ func (s *OAuthService) GetUserInfo(ctx context.Context, token *oauth2.Token) (*G
 		return nil, fmt.Errorf("unexpected status from userinfo endpoint: %d", resp.StatusCode)
 	}
 
-	var userInfo GoogleUserInfo
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+	var info GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		return nil, fmt.Errorf("failed to decode user info: %w", err)
 	}
-
-	return &userInfo, nil
-} 
+	return &info, nil
+}
