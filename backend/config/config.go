@@ -2,29 +2,28 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
-// Config holds all configuration for the application
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	OAuth    OAuthConfig
+	Server         ServerConfig
+	Database       DatabaseConfig
+	OAuth          OAuthConfig
+	CookieSecure   bool
+	AllowedOrigins []string
 }
 
-// ServerConfig holds server-related configuration
 type ServerConfig struct {
 	Port         string
 	Environment  string
-	FrontendPath string
 	FrontendURL  string
+	FrontendPath string
 }
 
-// DatabaseConfig holds database-related configuration
 type DatabaseConfig struct {
 	Host     string
 	Port     int
@@ -34,26 +33,21 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
-// OAuthConfig holds OAuth-related configuration
 type OAuthConfig struct {
 	GoogleClientID     string
 	GoogleClientSecret string
 	GoogleRedirectURL  string
 }
 
-// Load loads configuration from environment variables and .env file
 func Load() *Config {
-	// Try to load .env file (ignore error if file doesn't exist)
-	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found, using environment variables: %v", err)
-	}
+	_ = godotenv.Load()
 
-	config := &Config{
+	cfg := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("PORT", "8080"),
-			Environment:  getEnv("ENVIRONMENT", "development"),
-			FrontendPath: getEnv("FRONTEND_PATH", "frontend/dist"),
-			FrontendURL:  getEnv("FRONTEND_URL", "http://localhost:2010"),
+			Port:         getEnv("PORT", getEnv("SERVER_PORT", "8080")),
+			Environment:  getEnv("ENVIRONMENT", getEnv("SERVER_ENV", "development")),
+			FrontendURL:  getEnv("FRONTEND_URL", ""),
+			FrontendPath: getEnv("FRONTEND_PATH", ""),
 		},
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -68,52 +62,15 @@ func Load() *Config {
 			GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 			GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", ""),
 		},
+		CookieSecure: getEnvAsBool("COOKIE_SECURE", false),
 	}
 
-	// Validate required configuration
-	if err := config.Validate(); err != nil {
-		log.Printf("Configuration warning: %v", err)
-	}
+	origins := getEnv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
+	cfg.AllowedOrigins = strings.Split(origins, ",")
 
-	return config
+	return cfg
 }
 
-// LoadFromFile loads configuration from a specific .env file
-func LoadFromFile(filename string) *Config {
-	if err := godotenv.Load(filename); err != nil {
-		log.Fatalf("Error loading %s file: %v", filename, err)
-	}
-	return Load()
-}
-
-// Validate checks if required configuration is present
-func (c *Config) Validate() error {
-	if c.OAuth.GoogleClientID == "" || c.OAuth.GoogleClientSecret == "" || c.OAuth.GoogleRedirectURL == "" {
-		log.Println("Warning: Google OAuth credentials not set. Login will fail.")
-	}
-
-	if c.Database.Name == "" {
-		log.Println("Warning: Database name not set.")
-	}
-
-	if c.Database.Password == "" && c.IsDevelopment() {
-		log.Println("Warning: Database password not set.")
-	}
-
-	return nil
-}
-
-// IsDevelopment returns true if the environment is development
-func (c *Config) IsDevelopment() bool {
-	return c.Server.Environment == "development"
-}
-
-// IsProduction returns true if the environment is production
-func (c *Config) IsProduction() bool {
-	return c.Server.Environment == "production"
-}
-
-// GetDatabaseURL returns the PostgreSQL connection string
 func (c *Config) GetDatabaseURL() string {
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		c.Database.Host,
@@ -125,29 +82,26 @@ func (c *Config) GetDatabaseURL() string {
 	)
 }
 
-// getEnv gets an environment variable with a fallback value
 func getEnv(key, fallback string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
+	if v := os.Getenv(key); v != "" {
+		return v
 	}
 	return fallback
 }
 
-// getEnvAsInt gets an environment variable as integer with a fallback value
 func getEnvAsInt(key string, fallback int) int {
-	if value := os.Getenv(key); value != "" {
-		if intValue, err := strconv.Atoi(value); err == nil {
-			return intValue
+	if v := os.Getenv(key); v != "" {
+		if i, err := strconv.Atoi(v); err == nil {
+			return i
 		}
 	}
 	return fallback
 }
 
-// getEnvAsBool gets an environment variable as boolean with a fallback value
 func getEnvAsBool(key string, fallback bool) bool {
-	if value := os.Getenv(key); value != "" {
-		if boolValue, err := strconv.ParseBool(value); err == nil {
-			return boolValue
+	if v := os.Getenv(key); v != "" {
+		if b, err := strconv.ParseBool(v); err == nil {
+			return b
 		}
 	}
 	return fallback

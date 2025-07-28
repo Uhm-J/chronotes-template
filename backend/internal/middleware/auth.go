@@ -5,73 +5,32 @@ import (
 	"net/http"
 	"strconv"
 
-	"chronotes-template/backend/internal/repository"
-	"chronotes-template/backend/pkg/response"
+	"backend/internal/repository"
+	"backend/pkg/response"
 )
 
-// UserContextKey is the key for storing user in context
-type UserContextKey string
+type ctxKey string
 
-const UserKey UserContextKey = "user"
+const UserKey ctxKey = "user"
 
-// AuthMiddleware creates authentication middleware
-func AuthMiddleware(userRepo repository.UserRepository) func(http.Handler) http.Handler {
+func AuthMiddleware(repo repository.UserRepository) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get session cookie
 			cookie, err := r.Cookie("session")
 			if err != nil || cookie.Value == "" {
 				response.Unauthorized(w, "Authentication required")
 				return
 			}
-
-			// Parse user ID from cookie
-			userID, err := strconv.ParseInt(cookie.Value, 10, 64)
+			id, err := strconv.ParseUint(cookie.Value, 10, 32)
 			if err != nil {
 				response.Unauthorized(w, "Invalid session")
 				return
 			}
-
-			// Get user from database
-			user, err := userRepo.GetByID(userID)
+			user, err := repo.GetByID(uint(id))
 			if err != nil {
 				response.Unauthorized(w, "User not found")
 				return
 			}
-
-			// Add user to context
-			ctx := context.WithValue(r.Context(), UserKey, user)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-// OptionalAuth middleware that doesn't require authentication but adds user to context if present
-func OptionalAuthMiddleware(userRepo repository.UserRepository) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Get session cookie
-			cookie, err := r.Cookie("session")
-			if err != nil || cookie.Value == "" {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			// Parse user ID from cookie
-			userID, err := strconv.ParseInt(cookie.Value, 10, 64)
-			if err != nil {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			// Get user from database
-			user, err := userRepo.GetByID(userID)
-			if err != nil {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			// Add user to context
 			ctx := context.WithValue(r.Context(), UserKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

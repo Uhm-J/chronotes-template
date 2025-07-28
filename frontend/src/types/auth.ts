@@ -5,6 +5,11 @@ export interface User {
   avatar?: string;
 }
 
+export interface UserResponse {
+  data?: User;
+  
+}
+
 export interface AuthState {
   user: User | null;
   isLoading: boolean;
