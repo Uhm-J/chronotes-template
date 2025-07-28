@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { authApi } from '../lib/auth/api';
-import type { User, AuthState } from '../types';
+import type { User, AuthState, UserResponse } from '../types';
 
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
@@ -13,7 +13,6 @@ export const useAuth = () => {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
       const { isAuthenticated, user } = await authApi.checkAuthStatus();
-      
       setState({
         user: user || null,
         isLoading: false,
@@ -50,7 +49,7 @@ export const useAuth = () => {
       const user = await authApi.getCurrentUser();
       setState(prev => ({
         ...prev,
-        user,
+        user: user?.data || null,
         isAuthenticated: true,
       }));
     } catch (error) {

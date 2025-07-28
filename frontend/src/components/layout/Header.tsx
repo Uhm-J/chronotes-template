@@ -20,9 +20,12 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
         {/* User menu */}
         {user ? (
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm">
+            <div className="flex items-center space-x-3 text-sm">
               <User className="h-4 w-4" />
-              <span className="font-medium">{user.name}</span>
+              <div className="flex flex-col">
+                <span className="font-medium">{user.name}</span>
+                <span className="text-xs text-muted-foreground">{user.email}</span>
+              </div>
             </div>
             
             {onLogout && (

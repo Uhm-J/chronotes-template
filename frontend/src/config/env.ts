@@ -7,7 +7,7 @@ interface EnvConfig {
 
 const env: EnvConfig = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || '',
-  APP_NAME: import.meta.env.VITE_APP_NAME || 'Chronotes Template',
+  APP_NAME: import.meta.env.VITE_APP_NAME || 'Template',
   NODE_ENV: import.meta.env.MODE || 'development',
   DEV_MODE: import.meta.env.DEV || false,
 };

@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"chronotes-template/backend/internal/models"
-	"chronotes-template/backend/internal/repository"
+	"backend/internal/models"
+	"backend/internal/repository"
 
 	"gorm.io/gorm"
 )

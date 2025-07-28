@@ -44,8 +44,8 @@ func Load() *Config {
 
 	cfg := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("SERVER_PORT", "8080"),
-			Environment:  getEnv("SERVER_ENV", "development"),
+			Port:         getEnv("PORT", getEnv("SERVER_PORT", "8080")),
+			Environment:  getEnv("ENVIRONMENT", getEnv("SERVER_ENV", "development")),
 			FrontendURL:  getEnv("FRONTEND_URL", ""),
 			FrontendPath: getEnv("FRONTEND_PATH", ""),
 		},

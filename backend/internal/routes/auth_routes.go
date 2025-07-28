@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"chronotes-template/backend/internal/handlers"
-	"chronotes-template/backend/internal/middleware"
-	"chronotes-template/backend/internal/repository"
+	"backend/internal/handlers"
+	"backend/internal/middleware"
+	"backend/internal/repository"
 
 	"github.com/go-chi/chi/v5"
 )

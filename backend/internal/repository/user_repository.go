@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"chronotes-template/backend/internal/models"
-	"chronotes-template/backend/pkg/database"
+	"backend/internal/models"
+	"backend/pkg/database"
 
 	"gorm.io/gorm"
 )

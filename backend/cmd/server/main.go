@@ -10,14 +10,14 @@ import (
 	"github.com/go-chi/cors"
 	"gorm.io/gorm/logger"
 
-	"chronotes-template/backend/config"
-	"chronotes-template/backend/internal/handlers"
-	"chronotes-template/backend/internal/models"
-	"chronotes-template/backend/internal/repository"
-	"chronotes-template/backend/internal/routes"
-	"chronotes-template/backend/internal/services"
-	"chronotes-template/backend/pkg/auth"
-	"chronotes-template/backend/pkg/database"
+	"backend/config"
+	"backend/internal/handlers"
+	"backend/internal/models"
+	"backend/internal/repository"
+	"backend/internal/routes"
+	"backend/internal/services"
+	"backend/pkg/auth"
+	"backend/pkg/database"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := db.AutoMigrate(&models.User{}); err != nil {
+	if err := db.Migrate(&models.User{}); err != nil {
 		log.Fatalf("migrate: %v", err)
 	}
 

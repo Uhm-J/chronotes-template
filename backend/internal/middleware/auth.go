@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"chronotes-template/backend/internal/repository"
-	"chronotes-template/backend/pkg/response"
+	"backend/internal/repository"
+	"backend/pkg/response"
 )
 
 type ctxKey string

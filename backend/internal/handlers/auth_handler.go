@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"chronotes-template/backend/config"
-	"chronotes-template/backend/internal/middleware"
-	"chronotes-template/backend/internal/models"
-	"chronotes-template/backend/internal/services"
-	"chronotes-template/backend/pkg/auth"
-	"chronotes-template/backend/pkg/response"
+	"backend/config"
+	"backend/internal/middleware"
+	"backend/internal/models"
+	"backend/internal/services"
+	"backend/pkg/auth"
+	"backend/pkg/response"
 )
 
 type AuthHandler struct {
